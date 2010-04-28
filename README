@@ -1,0 +1,17 @@
+This is a mirror of http://www.vim.org/scripts/script.php?script_id=3075
+
+This is a script emulates Emacs Narrowing feature, by opening a selected range in a new scratch buffer.
+
+Similar scripts:
+narrow_region: http://www.vim.org/scripts/script.php?script_id=2038
+narrow: http://www.vim.org/scripts/script.php?script_id=2097
+narrow: http://www.vim.org/scripts/script.php?script_id=2446
+
+Use :NarrowRegion to narrow a line based selection or alternatively visually select a range and press <Leader>nr
+
+In the scratch buffer simply save it and the changes will be copied into the original file.
+This is only a very simple help. You should probably read the help, that is provided with the plugin. See :h NarrowRegion
+
+This Plugin is also available at github: http://github.com/chrisbra/NrrwRgn
+
+Please rate this plugin if you like it!
