@@ -1,8 +1,8 @@
 " NrrwRgn.vim - Narrow Region plugin for Vim
 " -------------------------------------------------------------
-" Version:	   0.10
+" Version:	   0.13
 " Maintainer:  Christian Brabandt <cb@256bit.org>
-" Last Change: Thu, 20 May 2010 23:14:49 +0200
+" Last Change: Sun, 22 Aug 2010 14:59:59 +0200
 "
 " Script: http://www.vim.org/scripts/script.php?script_id=3075 
 " Copyright:   (c) 2009, 2010 by Christian Brabandt
@@ -11,7 +11,7 @@
 "			   instead of "Vim".
 "			   No warranty, express or implied.
 "	 *** ***   Use At-Your-Own-Risk!   *** ***
-" GetLatestVimScripts: 3075 10 :AutoInstall: NrrwRgn.vim
+" GetLatestVimScripts: 3075 13 :AutoInstall: NrrwRgn.vim
 "
 " Functions:
 
@@ -62,7 +62,7 @@ fun! <sid>NrwRgnWin() "{{{1
 		noa wincmd p
     else
 		exe 'topleft ' . s:nrrw_rgn_wdth . (s:nrrw_rgn_vert?'v':'') . "sp " . s:nrrw_winname
-		setl noswapfile buftype=acwrite bufhidden=wipe foldcolumn=0 nobuflisted winfixwidth winfixheight
+		setl noswapfile buftype=acwrite bufhidden=wipe foldcolumn=0 nobuflisted
 		let nrrw_win = bufwinnr("")
     endif
     return nrrw_win
@@ -330,12 +330,50 @@ endfu
 
 fun! <sid>GeneratePattern(startl, endl, mode) "{{{1
     if a:mode ==# ''
-	return '\%>' . (a:startl[0]-1) . 'l\&\%>' . (a:startl[1]-1) . 'v\&\%<' . (a:endl[0]+1) . 'l\&\%<' . (a:endl[1]+1) . 'v'
+		return '\%>' . (a:startl[0]-1) . 'l\&\%>' . (a:startl[1]-1) . 'v\&\%<' . (a:endl[0]+1) . 'l\&\%<' . (a:endl[1]+1) . 'v'
     elseif a:mode ==# 'v'
-	return '\%>' . (a:startl[0]-1) . 'l\&\%>' . (a:startl[1]-1) . 'v\_.*\%<' . (a:endl[0]+1) . 'l\&\%<' . (a:endl[1]+1) . 'v'
+		return '\%>' . (a:startl[0]-1) . 'l\&\%>' . (a:startl[1]-1) . 'v\_.*\%<' . (a:endl[0]+1) . 'l\&\%<' . (a:endl[1]+1) . 'v'
     else
-	return '\%>' . (a:startl[0]-1) . 'l\&\%<' . (a:endl[0]+1) . 'l'
+		return '\%>' . (a:startl[0]-1) . 'l\&\%<' . (a:endl[0]+1) . 'l'
     endif
 endfun "}}}
+fun! nrrwrgn#UnifiedDiff() "{{{1
+	let save_winposview=winsaveview()
+	let orig_win = winnr()
+	" close previous opened Narrowed buffers
+	silent! windo | if bufname('')=~'^Narrow_Region' && &diff |diffoff|q!|endif
+	" minimize Window
+	" this is disabled, because this might be useful, to see everything
+	"exe "vert resize -999999"
+	"setl winfixwidth
+	" move to current start of chunk of unified diff
+	if search('^@@', 'bcW') > 0
+		call search('^@@', 'bc')
+	else
+		call search('^@@', 'c')
+	endif
+	let curpos=getpos('.')
+	for i in range(2)
+		if search('^@@', 'nW') > 0
+			.+,/@@/-NR
+		else
+			" Last chunk in file
+			.+,$NR
+		endif
+	   " Split vertically
+	   wincmd H
+	   if i==0
+		   silent! g/^-/d _
+	   else
+		   silent! g/^+/d _
+	   endif
+	   diffthis
+	   0
+	   exe ":noa wincmd p"
+	   call setpos('.', curpos)
+	endfor
+	call winrestview(save_winposview)
+endfun
+	
 
 " vim: ts=4 sts=4 fdm=marker com+=l\:\" fdl=0

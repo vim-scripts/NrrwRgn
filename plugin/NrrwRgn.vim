@@ -1,8 +1,8 @@
 " NrrwRgn.vim - Narrow Region plugin for Vim
 " -------------------------------------------------------------
-" Version:	   0.10
+" Version:	   0.13
 " Maintainer:  Christian Brabandt <cb@256bit.org>
-" Last Change: Thu, 20 May 2010 23:14:49 +0200
+" Last Change: Sun, 22 Aug 2010 14:59:59 +0200
 "
 " Script: http://www.vim.org/scripts/script.php?script_id=3075 
 " Copyright:   (c) 2009, 2010 by Christian Brabandt
@@ -11,7 +11,7 @@
 "			   instead of "Vim".
 "			   No warranty, express or implied.
 "	 *** ***   Use At-Your-Own-Risk!   *** ***
-" GetLatestVimScripts: 3075 10 :AutoInstall: NrrwRgn.vim
+" GetLatestVimScripts: 3075 13 :AutoInstall: NrrwRgn.vim
 "
 " Init: {{{1
 let s:cpo= &cpo
@@ -30,6 +30,7 @@ com! -range NR	 :exe ":" . <line1> . ',' . <line2> . "call nrrwrgn#NrrwRgn()"
 com! -range NRV  :call nrrwrgn#VisualNrrwRgn(visualmode())
 com! NW	 :exe ":" . line('w0') . ',' . line('w$') . "call nrrwrgn#NrrwRgn()"
 com! NarrowWindow :exe ":" . line('w0') . ',' . line('w$') . "call nrrwrgn#NrrwRgn()"
+com! NUD :call nrrwrgn#UnifiedDiff()
 
 " Define the Mapping:
 if !hasmapto('<Plug>NrrwrgnDo')
