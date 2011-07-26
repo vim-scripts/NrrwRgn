@@ -1,8 +1,8 @@
 " nrrwrgn.vim - Narrow Region plugin for Vim
 " -------------------------------------------------------------
-" Version:	   0.20
+" Version:	   0.21
 " Maintainer:  Christian Brabandt <cb@256bit.org>
-" Last Change: Mon, 25 Jul 2011 20:18:06 +0200
+" Last Change: Tue, 26 Jul 2011 09:06:42 +0200
 "
 " Script: http://www.vim.org/scripts/script.php?script_id=3075 
 " Copyright:   (c) 2009, 2010 by Christian Brabandt
@@ -11,7 +11,7 @@
 "			   instead of "Vim".
 "			   No warranty, express or implied.
 "	 *** ***   Use At-Your-Own-Risk!   *** ***
-" GetLatestVimScripts: 3075 20 :AutoInstall: NrrwRgn.vim
+" GetLatestVimScripts: 3075 21 :AutoInstall: NrrwRgn.vim
 "
 " Functions:
 
@@ -342,7 +342,9 @@ fu! nrrwrgn#WidenRegion(vmode,force) "{{{1
 	" Recalculate start- and endline numbers for all other Narrowed Windows.
 	" This matters, if you narrow different regions of the same file and
 	" write your changes back.
-	call <sid>RecalculateLineNumbers(instn, adjust_line_numbers)
+	if exists("g:nrrw_rgn_protect") && g:nrrw_rgn_protect =~? 'n'
+		call <sid>RecalculateLineNumbers(instn, adjust_line_numbers)
+	endif
 	call <sid>SaveRestoreRegister(0)
 	let  @/=s:o_s
 	call winrestview(wsv)
