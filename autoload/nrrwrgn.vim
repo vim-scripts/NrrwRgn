@@ -1,8 +1,8 @@
 " nrrwrgn.vim - Narrow Region plugin for Vim
 " -------------------------------------------------------------
-" Version:	   0.21
+" Version:	   0.24
 " Maintainer:  Christian Brabandt <cb@256bit.org>
-" Last Change: Tue, 26 Jul 2011 09:06:42 +0200
+" Last Change: Mon, 24 Oct 2011 21:26:45 +0200
 "
 " Script: http://www.vim.org/scripts/script.php?script_id=3075 
 " Copyright:   (c) 2009, 2010 by Christian Brabandt
@@ -11,7 +11,7 @@
 "			   instead of "Vim".
 "			   No warranty, express or implied.
 "	 *** ***   Use At-Your-Own-Risk!   *** ***
-" GetLatestVimScripts: 3075 21 :AutoInstall: NrrwRgn.vim
+" GetLatestVimScripts: 3075 24 :AutoInstall: NrrwRgn.vim
 "
 " Functions:
 
@@ -41,6 +41,13 @@ fun! <sid>Init() "{{{1
 		while (has_key(s:nrrw_rgn_lines, s:instn))
 			let s:instn+=1
 		endw
+	endif
+	let s:nrrw_aucmd = {}
+	if exists("b:nrrw_aucmd_create")
+		let s:nrrw_aucmd["create"] = b:nrrw_aucmd_create
+	endif
+	if exists("b:nrrw_aucmd_close")
+		let s:nrrw_aucmd["close"] = b:nrrw_aucmd_close
 	endif
 	if !exists("s:nrrw_rgn_lines")
 		let s:nrrw_rgn_lines = {}
@@ -117,6 +124,12 @@ fun! nrrwrgn#NrrwRgn() range  "{{{1
 	"com! -buffer WidenRegion :call nrrwrgn#WidenRegion(0) |sil bd!
 	com! -buffer -bang WidenRegion :call nrrwrgn#WidenRegion(0, (empty("<bang>") ? 0 : 1))
 	call <sid>NrrwRgnAuCmd(0)
+	if has_key(s:nrrw_aucmd, "create")
+		exe s:nrrw_aucmd["create"]
+	endif
+	if has_key(s:nrrw_aucmd, "close")
+		let b:nrrw_aucmd_close = s:nrrw_aucmd["close"]
+	endif
 
 	" restore settings
 	let &lz   = o_lz
@@ -246,6 +259,10 @@ fu! nrrwrgn#WidenRegion(vmode,force) "{{{1
 	let orig_buf = b:orig_buf
 	let orig_tab = tabpagenr()
 	let instn    = b:nrrw_instn
+	" Execute autocommands
+	if has_key(s:nrrw_aucmd, "close")
+		exe s:nrrw_aucmd["close"]
+	endif
 	let cont	 = getline(1,'$')
 
 	let tab=<sid>BufInTab(orig_buf)
@@ -420,7 +437,12 @@ fu! nrrwrgn#VisualNrrwRgn(mode) "{{{1
 	silent 0d _
 	setl nomod
 	com! -buffer -bang WidenRegion :call nrrwrgn#WidenRegion(1, (empty("<bang>") ? 0 : 1))
+	" Setup autocommands
 	call <sid>NrrwRgnAuCmd(0)
+	" Execute autocommands
+	if has_key(s:nrrw_aucmd, "create")
+		exe s:nrrw_aucmd["create"]
+	endif
 	call <sid>SaveRestoreRegister(0)
 
 	" restore settings
